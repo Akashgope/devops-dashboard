@@ -1,0 +1,6 @@
+
+.env
+config/gcp-service-account-key.json
+__pycache__/
+*.pyc
+data/raw/*
