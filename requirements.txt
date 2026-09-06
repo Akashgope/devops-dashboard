@@ -10,13 +10,13 @@ azure-mgmt-costmanagement==4.0.0
 
 # GCP
 google-cloud-billing==1.13.0
+google-cloud-bigquery==3.25.0
 google-auth==2.32.0
 
-# Data Processing & Database
+# Database & Data Processing
+psycopg2-binary==2.9.9
 pandas==2.2.2
-psycopg2-binary==2.9.9  # For PostgreSQL
-# pymongo==4.7.0        # Uncomment if using MongoDB
 
-# Scheduling (for daily data pulls)
+# Scheduling
 schedule==1.2.1
 

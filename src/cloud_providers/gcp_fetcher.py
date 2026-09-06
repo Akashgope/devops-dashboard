@@ -1,47 +1,65 @@
+import sys
 import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 from dotenv import load_dotenv
-from google.cloud import billing_v1
-from google.auth import credentials
-import json
+from google.cloud import bigquery
 from datetime import datetime, timedelta
+from src.data_processing.standardizer import standardize_gcp_data
+from src.data_processing.db_connector import insert_cost_records
 
 load_dotenv('config/.env')
 
-def fetch_gcp_costs(days_back=7):
+def fetch_and_store_gcp_costs(days_back=7, environment='prod'):
+    """
+    Fetches GCP costs from the BigQuery billing export table.
+    """
     try:
-        # The path to the service account JSON is set in GOOGLE_APPLICATION_CREDENTIALS env var
-        # Or we can explicitly pass it.
-        creds_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-        if not creds_path or not os.path.exists(creds_path):
-            raise FileNotFoundError(f"GCP credentials file not found at {creds_path}")
+        client = bigquery.Client()
 
-        # Initialize the Cloud Billing Client
-        client = billing_v1.CloudBillingClient()
+        table_id = os.getenv('GCP_BILLING_TABLE')
+        
+        if not table_id:
+            print("⚠️ GCP: 'GCP_BILLING_TABLE' not set in .env. Skipping GCP data fetch.")
+            return None
 
-        # Since we are using a service account key file, the client picks it up automatically.
-        # To get cost data, we use the Cloud Catalog API to list SKUs,
-        # BUT for actual billing data, we need the Cloud Billing Budget API or export to BigQuery.
-        # For a simple test, we will list the billing accounts the service account has access to.
+        end_date = datetime.now().strftime('%Y-%m-%d')
+        start_date = (datetime.now() - timedelta(days=days_back)).strftime('%Y-%m-%d')
 
-        print("🔍 Fetching GCP Billing Accounts...")
-        request = billing_v1.ListBillingAccountsRequest()
-        response = client.list_billing_accounts(request=request)
+        query = f"""
+        SELECT 
+            cost,
+            usage_date,
+            service.description as service_name,
+            project.id as resource_id,
+            location.location as region
+        FROM `{table_id}`
+        WHERE usage_date >= DATE('{start_date}')
+        AND usage_date <= DATE('{end_date}')
+        AND cost > 0
+        ORDER BY usage_date DESC
+        LIMIT 1000
+        """
 
-        print("✅ GCP Billing Accounts Retrieved:")
-        for account in response.billing_accounts:
-            print(f" - Name: {account.name}, Display Name: {account.display_name}, Open: {account.open}")
+        print(f"🔍 Fetching GCP costs from {start_date} to {end_date}...")
+        query_job = client.query(query)
+        rows = query_job.result()
 
-        # Note: To fetch actual cost data programmatically, you MUST export billing data to BigQuery.
-        # GCP does not have a simple "Get Cost" API like AWS/Azure.
-        # We will handle the BigQuery export in Sprint 2.
-        # For now, we just confirm connectivity.
+        records = standardize_gcp_data(rows, environment)
 
-        return response
+        if records:
+            insert_cost_records(records)
+            print(f"✅ Inserted {len(records)} GCP records.")
+        else:
+            print("⚠️ No GCP records found.")
+
+        return rows
 
     except Exception as e:
-        print(f"❌ Error fetching GCP data: {str(e)}")
+        print(f"❌ Error fetching GCP costs: {str(e)}")
         return None
 
 if __name__ == "__main__":
-    fetch_gcp_costs()
+    fetch_and_store_gcp_costs()
 
