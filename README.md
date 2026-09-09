@@ -105,10 +105,14 @@ text
 
 
 **Screenshot 8: Scheduler Running Successfully**
-[Insert screenshot of `python src/scheduler.py` running with no errors]
+
+<img width="1442" height="418" alt="image" src="https://github.com/user-attachments/assets/197df409-3d0f-4d62-be5a-37b508454b22" />
+
 
 **Screenshot 9: GCP BigQuery Export Enabled**
-[Insert screenshot of GCP Console showing BigQuery billing export enabled]
+
+<img width="3076" height="776" alt="image" src="https://github.com/user-attachments/assets/092cc60b-a1fe-45b4-8b01-f0f3debb2ed0" />
+
 
 ### Key Files Created in Sprint 2
 src/data_processing/
