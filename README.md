@@ -129,6 +129,69 @@ src/
 └── scheduler.py # Daily automated data pipeline
 
 
+TECHNICAL IMPLEMENTATION DETAILS
+============================================================
+
+1. POSTGRESQL SETUP
+------------------------------------------------------------
+Run the PostgreSQL Docker container:
+
+    docker run --name postgres-dashboard \
+      -e POSTGRES_PASSWORD=your_secure_password \
+      -e POSTGRES_DB=cloudcost \
+      -p 5432:5432 \
+      -d postgres:latest
+
+
+2. UNIFIED DATA STANDARDIZATION
+------------------------------------------------------------
+Each provider's API response is transformed into a common format:
+
+    {
+        'provider': 'AWS',
+        'resource_id': 'i-12345',
+        'resource_type': 'Compute',
+        'environment': 'prod',
+        'cost': 12.50,
+        'cpu_util_avg': 45.2,
+        'memory_util_avg': 60.1,
+        'usage_date': '2026-09-06',
+        'raw_data': '{...}'   # Original JSON for debugging
+    }
+
+
+3. AUTOMATED DAILY SCHEDULER
+------------------------------------------------------------
+The scheduler runs every day at 10:00 AM:
+
+    schedule.every().day.at("10:00").do(run_all_fetchers)
+
+It fetches the last 7 days of data from all providers:
+
+    fetch_and_store_aws_costs(days_back=7)
+    fetch_and_store_azure_costs(days_back=7)
+    fetch_and_store_gcp_costs(days_back=7)
+
+
+============================================================
+VERIFICATION STEPS COMPLETED
+============================================================
+
+Test                  Command                                            Result
+--------------------------------------------------------------------------
+PostgreSQL Running    docker ps | grep postgres                          ✅ Container Up
+Table Created         \dt in psql                                       ✅ cost_usage exists
+AWS Data Inserted     SELECT COUNT(*) FROM cost_usage WHERE provider='AWS';   ✅ Records found
+Azure Data Inserted   SELECT COUNT(*) FROM cost_usage WHERE provider='Azure';  ✅ Records found
+GCP Data Inserted     SELECT COUNT(*) FROM cost_usage WHERE provider='GCP';    ✅ Records found
+Scheduler Test        python src/scheduler.py                           ✅ Runs without errors
+
+============================================================
+✅ TECHNICAL IMPLEMENTATION COMPLETE
+============================================================
+
+
+
 
 # 🚀 Sprint 3: Real-Time Dashboard Development – Completed ✅
 
