@@ -176,29 +176,6 @@ text
 
 ---
 
-## 🔄 Updated Next Steps Roadmap (After Sprint 2)
 
-**Replace your existing Section 4 "Next Steps" with this updated version:**
 
-```markdown
-## Section 5: Next Steps (Roadmap)
-
-| Sprint | Deliverable | Status |
-|--------|-------------|--------|
-| Sprint 1 | Cloud API Connectivity (AWS, Azure, GCP) | ✅ Completed |
-| Sprint 2 | Data Aggregation & PostgreSQL Storage | ✅ Completed |
-| Sprint 3 | Real-Time Dashboard (FastAPI + React/Grafana) | 🔄 In Progress |
-| Sprint 4 | Historical Data Trends & Charts | 📋 Planned |
-| Sprint 5 | Alerting & Slack/Teams Integration | 📋 Planned |
-| Sprint 6 | Testing, Dockerization, Documentation | 📋 Planned |
-
-### Sprint 3 Preview (Next Steps)
-1. Build FastAPI backend with `/api/current` and `/api/historical` endpoints
-2. Create React dashboard with Chart.js visualizations
-3. Implement provider, resource type, and environment filters
-4. Display cost trends and resource utilization metrics
-
-Section 6: Conclusion
-
-"The project has successfully established connectivity with all three major cloud providers (AWS, Azure, and GCP). Sprint 2 has now added a robust data aggregation and storage layer using PostgreSQL, with a unified schema that standardizes data from all providers. The daily scheduler ensures automated data collection, providing a solid foundation for the dashboard. The remaining sprints will focus on building the visualization layer (Sprint 3), implementing historical trend analysis (Sprint 4), setting up alerts (Sprint 5), and final deployment with Docker (Sprint 6). The project remains on track for full delivery within the planned timeline."
 
